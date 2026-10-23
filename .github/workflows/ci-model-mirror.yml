@@ -1,0 +1,32 @@
+name: PR 1000 CI model mirror
+on:
+  push:
+    branches: [ci/pr-1000-model-assets]
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download and verify unchanged upstream CI model
+        run: |
+          mkdir model
+          gh release download torrent-ner-v3 --repo movieclaw/MovieClaw --dir model
+          cd model
+          cat > /tmp/model-SHA256SUMS <<'HASHES'
+          86451093d5112802bc19a34675115cf417fb70749df8c2059df98923b605f2ab  labels.json
+          fae0c51cb3fa6cf8f8351f9bf62198d912aa44006aa39fa761e7b0e69aebd5b5  manifest.json
+          f59764e2021d0c8dbb84f580916d478a587d44e3f8d7778cbaca31a71a3734a3  model.int8.onnx
+          a34543f1ac37c19b829db3674d5af635d1d72a5b4b3801d0ba208911df5860a2  tokenizer.json
+          HASHES
+          sha256sum --check /tmp/model-SHA256SUMS
+      - name: Supply repository-local CI dependency (no application release or deployment)
+        run: |
+          gh release create torrent-ner-v3 model/* --repo "$GITHUB_REPOSITORY" \
+            --target 1b73cb1de9c1f043649545372daac7be26dcc7b0 \
+            --title 'torrent-ner-v3 (verified upstream CI model mirror)' \
+            --notes 'Byte-for-byte mirror of movieclaw/MovieClaw torrent-ner-v3, SHA-256 verified for PR #1000 CI. Model dependency only; no application release, server deployment, or Docker changes.' \
+            --prerelease --latest=false

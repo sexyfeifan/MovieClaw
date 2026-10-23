@@ -733,9 +733,12 @@ nonisolated extension API {
     /// 首次初始化状态：前端据此决定进引导页（/setup）还是登录页（/login）。
     struct BootstrapStatus: Codable, Hashable, Sendable {
         var initialized: Bool
+        /// 服务端接受的原生 App 设备类型；旧服务端可能不提供
+        var nativeDeviceKinds: [String]?
 
         enum CodingKeys: String, CodingKey {
             case initialized
+            case nativeDeviceKinds = "native_device_kinds"
         }
     }
 
@@ -2049,7 +2052,7 @@ nonisolated extension API {
     /// 刻意**没有权限字段**：客户端只声明自己是什么形态、叫什么名字，
     /// 能做什么由批准者决定。
     struct DeviceAuthorizeRequest: Codable, Hashable, Sendable {
-        /// 客户端形态：worker（转码 Worker）、cli（命令行 / Agent）、tvos（Apple TV App）、macos（Mac App）、androidtv（Android TV App）
+        /// 客户端形态：worker（转码 Worker）、cli（命令行 / Agent）、tvos（Apple TV App）、macos（Mac App）、windows（Windows App）、androidtv（Android TV App）
         var clientType: String
         /// 设备名，批准页上给人看的，如 'Yi的Mac-mini'
         var clientName: String

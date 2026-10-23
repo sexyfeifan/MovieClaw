@@ -77,11 +77,15 @@ data class AudioTrackView(
 )
 
 /**
- * 首次初始化状态：前端据此决定进引导页（/setup）还是登录页（/login）。
+ * 首次初始化状态及公开的原生设备登录能力，不包含账号或凭据信息。
  */
 @Serializable
 data class BootstrapStatus(
     @SerialName("initialized") val initialized: Boolean = false,
+    /**
+     * 服务端接受的原生 App 设备类型；旧服务端可能不提供
+     */
+    @SerialName("native_device_kinds") val nativeDeviceKinds: List<String>? = null,
 )
 
 /**
@@ -426,7 +430,7 @@ data class CollectionView(
 @Serializable
 data class DeviceAuthorizeRequest(
     /**
-     * 客户端形态：worker（转码 Worker）、cli（命令行 / Agent）、tvos（Apple TV App）、macos（Mac App）、androidtv（Android TV App）
+     * 客户端形态：worker（转码 Worker）、cli（命令行 / Agent）、tvos（Apple TV App）、macos（Mac App）、windows（Windows App）、androidtv（Android TV App）
      */
     @SerialName("client_type") val clientType: String,
     /**
